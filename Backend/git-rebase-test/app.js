@@ -46,7 +46,29 @@ app.post('/users/signup', async(req,res)=> {
       ?,
       ?
     )`, [username, email, password]
-  )
+  )})
+app.post('/users/signin', async (req,res)=> {
+  const {email, password} = req.body;
+  const user = await appDataSource.query(
+    `SELECT
+    users.id,
+    users.password
+    FROM
+    users
+    WHERE
+    users.email = ?`,
+    [email]
+  );
+
+  if(!user) {
+    return res.json({message : "SIGNUP_REQUIRED"})
+  }
+
+  if(!(user[0].password === password)) {
+    return res.json({message: "INVALID_PASSWORD"})
+  };
+
+  return res.json({userId: user.id});
 })
 
 app.listen(PORT, () => {
